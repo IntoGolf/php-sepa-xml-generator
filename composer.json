@@ -6,6 +6,10 @@
 	"license": "MIT",
 	"authors": [
 		{
+			"name": "itemvirtual",
+			"email": "projectes@itemvirtual.com"
+		},
+		{
 			"name": "Dmitri Russu",
 			"email": "dmitri.russu@gmail.com"
 		}
