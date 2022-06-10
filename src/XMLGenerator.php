@@ -9,6 +9,8 @@
 
 namespace SEPA;
 
+use DOMDocument;
+use Exception;
 use SimpleXMLElement;
 
 require_once 'error_messages.php';
@@ -31,7 +33,7 @@ class XMLGenerator extends ValidationRules implements XMLGeneratorInterface
      *
      * @var String
      */
-    private static $DOCUMENT_PAIN_MODE;
+    private static string $DOCUMENT_PAIN_MODE;
     /**
      * @var
      */
@@ -39,33 +41,36 @@ class XMLGenerator extends ValidationRules implements XMLGeneratorInterface
     /**
      * @var array
      */
-    private $sepaMessageObjects = array();
+    private array $sepaMessageObjects = array();
     /**
      * @var SimpleXMLElement
      */
-    private $xml;
+    private SimpleXMLElement $xml;
 
+    /**
+     * @throws Exception
+     */
     public function __construct($documentPainMode = self::PAIN_008_001_02)
     {
         $this->setDocumentPainMode($documentPainMode);
         $this->xml = new SimpleXMLElement($this->getDocument());
     }
 
-    public function setDocumentPainMode($documentPainMode)
+    public function setDocumentPainMode($documentPainMode): XMLGenerator
     {
         self::$DOCUMENT_PAIN_MODE = $documentPainMode;
 
         $this->document = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <Document
-	xmlns=\"urn:iso:std:iso:20022:tech:xsd:{$documentPainMode}\"
+	xmlns=\"urn:iso:std:iso:20022:tech:xsd:$documentPainMode\"
 	xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
-	xsi:schemaLocation=\"urn:iso:std:iso:20022:tech:xsd:{$documentPainMode} {$documentPainMode}.xsd\">
+	xsi:schemaLocation=\"urn:iso:std:iso:20022:tech:xsd:$documentPainMode $documentPainMode.xsd\">
 </Document>";
 
         return $this;
     }
 
-    public function getDocumentPainMode()
+    public function getDocumentPainMode(): string
     {
         return self::$DOCUMENT_PAIN_MODE;
     }
@@ -81,7 +86,7 @@ class XMLGenerator extends ValidationRules implements XMLGeneratorInterface
      * @param Message $messageObject
      * @return $this
      */
-    public function addXmlMessage(Message $messageObject)
+    public function addXmlMessage(Message $messageObject): XMLGenerator
     {
         $this->sepaMessageObjects[] = $messageObject;
         return $this;
@@ -91,13 +96,14 @@ class XMLGenerator extends ValidationRules implements XMLGeneratorInterface
      * Save Xml File
      *
      * @param null $fileName
-     * @return bool|mixed
+     * @return bool|XMLGenerator
+     * @throws Exception
      */
     public function save($fileName = null)
     {
         //save to file
         if ($fileName) {
-            $dom = new \DOMDocument('1.0');
+            $dom = new DOMDocument('1.0');
             $dom->preserveWhiteSpace = false;
             $dom->formatOutput = true;
 
@@ -108,7 +114,7 @@ class XMLGenerator extends ValidationRules implements XMLGeneratorInterface
                 $dom->loadXML($this->getGeneratedXml());
             }
 
-            return ($dom->save($fileName) ? true : false);
+            return (bool)$dom->save($fileName);
         }
 
         return $this;
@@ -116,6 +122,7 @@ class XMLGenerator extends ValidationRules implements XMLGeneratorInterface
 
     /**
      * Generate Messages
+     * @throws Exception
      */
     private function generateMessages()
     {
@@ -128,7 +135,8 @@ class XMLGenerator extends ValidationRules implements XMLGeneratorInterface
     /**
      * Get Generated Xml
      *
-     * @return mixed
+     * @return bool|string
+     * @throws Exception
      */
     public function getGeneratedXml()
     {
@@ -138,7 +146,10 @@ class XMLGenerator extends ValidationRules implements XMLGeneratorInterface
         return $this->xml->asXML();
     }
 
-    public function view($withOutOfHeader = false)
+    /**
+     * @throws Exception
+     */
+    public function view($withOutOfHeader = false): XMLGenerator
     {
         if (!$withOutOfHeader) {
             header("Content-Type:text/xml");
@@ -168,7 +179,7 @@ class XMLGenerator extends ValidationRules implements XMLGeneratorInterface
      * @param                  $newName
      * @return SimpleXMLElement
      */
-    function renameXmlNodeName(SimpleXMLElement $node, $newName)
+    function renameXmlNodeName(SimpleXMLElement $node, $newName): SimpleXMLElement
     {
         $newNode = new SimpleXMLElement("<$newName></$newName>");
 

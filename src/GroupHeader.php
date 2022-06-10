@@ -9,6 +9,10 @@
 
 namespace SEPA;
 
+use DateTime;
+use Exception;
+use SimpleXMLElement;
+
 /**
  * Class SepaGroupHeader
  *
@@ -24,7 +28,7 @@ class GroupHeader extends Message implements GroupHeaderInterface
      *
      * @var string
      */
-    private $messageIdentification = '';
+    private string $messageIdentification = '';
     /**
      * Date and time at which a (group of) payment instruction(s) was created by the instructing party.
      *
@@ -84,14 +88,14 @@ class GroupHeader extends Message implements GroupHeaderInterface
      *
      * @param $msgId
      * @return $this
-     * @throws \Exception
+     * @throws Exception
      */
-    public function setMessageIdentification($msgId)
+    public function setMessageIdentification($msgId): GroupHeader
     {
         $msgId = $this->unicodeDecode($msgId);
 
         if (!$this->checkStringLength($msgId, 35)) {
-            throw new \Exception(ERROR_MSG_MESSAGE_IDENTIFICATION);
+            throw new Exception(ERROR_MSG_MESSAGE_IDENTIFICATION);
         }
         $this->messageIdentification = $msgId;
         return $this;
@@ -100,7 +104,7 @@ class GroupHeader extends Message implements GroupHeaderInterface
     /**
      * @return string
      */
-    public function getMessageIdentification()
+    public function getMessageIdentification(): string
     {
         return $this->messageIdentification;
     }
@@ -111,15 +115,15 @@ class GroupHeader extends Message implements GroupHeaderInterface
      * @param $CreDtTm
      * @return $this
      */
-    public function setCreationDateTime($CreDtTm)
+    public function setCreationDateTime($CreDtTm): GroupHeader
     {
         $this->CreationDateTime = $CreDtTm;
         return $this;
     }
 
-    public function getCreationDateTime()
+    public function getCreationDateTime(): string
     {
-        $date = new \DateTime();
+        $date = new DateTime();
 
         if (!$this->CreationDateTime) {
             $this->CreationDateTime = $date->format('Y-m-d\TH:i:s');
@@ -134,7 +138,7 @@ class GroupHeader extends Message implements GroupHeaderInterface
      * @param $organisationId
      * @return $this
      */
-    public function setOrganisationIdentification($organisationId)
+    public function setOrganisationIdentification($organisationId): GroupHeader
     {
         $this->OrganisationIdentification = $organisationId;
         return $this;
@@ -144,7 +148,7 @@ class GroupHeader extends Message implements GroupHeaderInterface
      * @param $issuer
      * @return $this
      */
-    public function setIssuer($issuer)
+    public function setIssuer($issuer): GroupHeader
     {
         $this->Issuer = $issuer;
         return $this;
@@ -156,7 +160,7 @@ class GroupHeader extends Message implements GroupHeaderInterface
      * @param $PrvtId
      * @return $this
      */
-    public function setPrivateIdentification($PrvtId)
+    public function setPrivateIdentification($PrvtId): GroupHeader
     {
         $this->PrivateIdentification = $PrvtId;
         return $this;
@@ -168,25 +172,28 @@ class GroupHeader extends Message implements GroupHeaderInterface
      *
      * @param $name
      * @return $this
-     * @throws \Exception
+     * @throws Exception
      */
-    public function setInitiatingPartyName($name)
+    public function setInitiatingPartyName($name): GroupHeader
     {
         $name = $this->unicodeDecode($name);
 
         if (!$this->checkStringLength($name, 140)) {
-            throw new \Exception(ERROR_MSG_INITIATING_PARTY_NAME);
+            throw new Exception(ERROR_MSG_INITIATING_PARTY_NAME);
         }
         $this->InitiatingPartyName = $name;
         return $this;
     }
 
-    public function setAddressLine($name)
+    /**
+     * @throws Exception
+     */
+    public function setAddressLine($name): GroupHeader
     {
         $name = $this->unicodeDecode($name);
 
         if (!$this->checkStringLength($name, 140)) {
-            throw new \Exception(ERROR_MSG_INITIATING_PARTY_NAME);
+            throw new Exception(ERROR_MSG_INITIATING_PARTY_NAME);
         }
 
         $this->AddressLine = $name;
@@ -194,12 +201,15 @@ class GroupHeader extends Message implements GroupHeaderInterface
         return $this;
     }
 
-    public function setCountry($name)
+    /**
+     * @throws Exception
+     */
+    public function setCountry($name): GroupHeader
     {
         $name = $this->unicodeDecode($name);
 
         if (!$this->checkStringLength($name, 140)) {
-            throw new \Exception(ERROR_MSG_INITIATING_PARTY_NAME);
+            throw new Exception(ERROR_MSG_INITIATING_PARTY_NAME);
         }
 
         $this->Country = $name;
@@ -207,17 +217,17 @@ class GroupHeader extends Message implements GroupHeaderInterface
         return $this;
     }
 
-    public function getInitiatingPartyName()
+    public function getInitiatingPartyName(): string
     {
         return $this->InitiatingPartyName;
     }
 
-    public function getAddressLine()
+    public function getAddressLine(): string
     {
         return $this->AddressLine;
     }
 
-    public function getCountry()
+    public function getCountry(): string
     {
         return $this->Country;
     }
@@ -226,7 +236,7 @@ class GroupHeader extends Message implements GroupHeaderInterface
      * This method returns the total Amount that has been registered for all payment info
      *
      * @param $amount
-     * @return float
+     * @return GroupHeader
      */
     public function setControlSum($amount)
     {
@@ -238,7 +248,7 @@ class GroupHeader extends Message implements GroupHeaderInterface
      * Get total number of transactions
      *
      * @param $nbTransactions
-     * @return int
+     * @return GroupHeader
      */
     public function setNumberOfTransactions($nbTransactions)
     {
@@ -249,9 +259,9 @@ class GroupHeader extends Message implements GroupHeaderInterface
     /**
      * This method returns the total Amount that has been registered for all payment info
      *
-     * @return float
+     * @return string
      */
-    public function getControlSum()
+    public function getControlSum(): string
     {
         return $this->amountToString($this->ControlSum);
     }
@@ -261,7 +271,7 @@ class GroupHeader extends Message implements GroupHeaderInterface
      *
      * @return int
      */
-    public function getNumberOfTransactions()
+    public function getNumberOfTransactions(): int
     {
         return $this->NumberOfTransactions;
     }
@@ -272,12 +282,12 @@ class GroupHeader extends Message implements GroupHeaderInterface
      *
      * @param $value
      * @return $this
-     * @throws \Exception
+     * @throws Exception
      */
-    public function setBatchBooking($value)
+    public function setBatchBooking($value): GroupHeader
     {
         if (is_null($value) || empty($value)) {
-            throw new \Exception(ERROR_MSG_PM_BATCH_BOOKING);
+            throw new Exception(ERROR_MSG_PM_BATCH_BOOKING);
         }
 
         $this->batchBooking = $value;
@@ -295,12 +305,12 @@ class GroupHeader extends Message implements GroupHeaderInterface
     /**
      * Returns a XML for the group Header object
      *
-     * @return \SimpleXMLElement
+     * @return SimpleXMLElement
      */
-    public function getSimpleXmlGroupHeader()
+    public function getSimpleXmlGroupHeader(): SimpleXMLElement
     {
         $id = null;
-        $groupHeader = new \SimpleXMLElement("<GrpHdr></GrpHdr>");
+        $groupHeader = new SimpleXMLElement("<GrpHdr></GrpHdr>");
         $groupHeader->addChild('MsgId', $this->getMessageIdentification());
         $groupHeader->addChild('CreDtTm', $this->getCreationDateTime());
         if ($this->getDocumentPainMode() === self::PAIN_001_001_02) {

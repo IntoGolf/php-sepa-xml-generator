@@ -9,6 +9,9 @@
 
 namespace SEPA;
 
+use Exception;
+use SimpleXMLElement;
+
 /**
  * Class SepaMessage
  *
@@ -21,24 +24,28 @@ class Message extends XMLGenerator implements MessageInterface
      */
     private $groupHeaderObjects;
     /**
-     * @var $message \SimpleXMLElement
+     * @var $message SimpleXMLElement
      */
-    private $message;
+    private SimpleXMLElement $message;
     /**
-     * @var $storeXmlPaymentsInfo \SimpleXMLElement
+     * @var $storeXmlPaymentsInfo SimpleXMLElement
      */
-    private $storeXmlPaymentsInfo;
+    private SimpleXMLElement $storeXmlPaymentsInfo;
     /**
      * @var array
      */
-    private $paymentInfoObjects = array();
+    private array $paymentInfoObjects = array();
 
     public function __construct()
     {
         $this->createMessage();
-        $this->storeXmlPaymentsInfo = new \SimpleXMLElement('<payments></payments>');
+        $this->storeXmlPaymentsInfo = new SimpleXMLElement('<payments></payments>');
+        parent::__construct();
     }
 
+    /**
+     * @throws Exception
+     */
     private function createMessage()
     {
         switch ($this->getDocumentPainMode()) {
@@ -55,7 +62,7 @@ class Message extends XMLGenerator implements MessageInterface
             }
         }
 
-        $this->message = new \SimpleXMLElement($documentMessage);
+        $this->message = new SimpleXMLElement($documentMessage);
     }
 
     /**
@@ -64,7 +71,7 @@ class Message extends XMLGenerator implements MessageInterface
      * @param GroupHeader $groupHeaderObject
      * @return $this
      */
-    public function setMessageGroupHeader(GroupHeader $groupHeaderObject)
+    public function setMessageGroupHeader(GroupHeader $groupHeaderObject): Message
     {
         if (is_null($this->groupHeaderObjects)) {
             $this->groupHeaderObjects = $groupHeaderObject;
@@ -76,7 +83,7 @@ class Message extends XMLGenerator implements MessageInterface
     /**
      * @return GroupHeader
      */
-    public function getMessageGroupHeader()
+    public function getMessageGroupHeader(): GroupHeader
     {
         return $this->groupHeaderObjects;
     }
@@ -86,12 +93,12 @@ class Message extends XMLGenerator implements MessageInterface
      *
      * @param PaymentInfo $paymentInfoObject
      * @return $this
-     * @throws \Exception
+     * @throws Exception
      */
-    public function addMessagePaymentInfo(PaymentInfo $paymentInfoObject)
+    public function addMessagePaymentInfo(PaymentInfo $paymentInfoObject): Message
     {
         if (!($paymentInfoObject instanceof PaymentInfo)) {
-            throw new \Exception('Was not PaymentInfo Object in addMessagePaymentInfo');
+            throw new Exception('Was not PaymentInfo Object in addMessagePaymentInfo');
         }
 
         $paymentInfoObject->resetNumberOfTransactions();
@@ -105,7 +112,7 @@ class Message extends XMLGenerator implements MessageInterface
      *
      * @return array
      */
-    public function getPaymentInfoObjects()
+    public function getPaymentInfoObjects(): array
     {
         return $this->paymentInfoObjects;
     }
@@ -113,17 +120,17 @@ class Message extends XMLGenerator implements MessageInterface
     /**
      * Get Simple Xml Element Message
      *
-     * @return \SimpleXMLElement
-     * @throws \Exception
+     * @return SimpleXMLElement
+     * @throws Exception
      */
-    public function getSimpleXMLElementMessage()
+    public function getSimpleXMLElementMessage(): SimpleXMLElement
     {
         /**
          * @var $paymentInfo PaymentInfo
          */
         foreach ($this->paymentInfoObjects as $paymentInfo) {
             if (!$paymentInfo->checkIsValidPaymentInfo()) {
-                throw new \Exception(ERROR_MSG_INVALID_PAYMENT_INFO . $paymentInfo->getPaymentInformationIdentification());
+                throw new Exception(ERROR_MSG_INVALID_PAYMENT_INFO . $paymentInfo->getPaymentInformationIdentification());
             }
 
             $paymentInfo->resetControlSum();
