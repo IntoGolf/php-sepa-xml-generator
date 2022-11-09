@@ -608,7 +608,7 @@ class PaymentInfo extends Message implements PaymentInfoInterface
     /**
      * Change the default local instrument code to the specified in the argument.
      *
-     * @param $localInstrumentCode The new code for local instrument.
+     * @param $localInstrumentCode
      * @return $this
      */
     public function setLocalInstrumentCode($localInstrumentCode)
