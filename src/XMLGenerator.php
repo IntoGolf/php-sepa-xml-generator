@@ -57,7 +57,7 @@ class XMLGenerator extends ValidationRules implements XMLGeneratorInterface
     }
 
     public function __destruct() {
-        // Destruction logic here (if any)
+        // Destruction logic here (if any)))
     }
 
     public function setDocumentPainMode($documentPainMode): XMLGenerator
