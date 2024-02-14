@@ -56,6 +56,10 @@ class XMLGenerator extends ValidationRules implements XMLGeneratorInterface
         $this->xml = new SimpleXMLElement($this->getDocument());
     }
 
+    public function __destruct() {
+        // Destruction logic here (if any)
+    }
+
     public function setDocumentPainMode($documentPainMode): XMLGenerator
     {
         self::$DOCUMENT_PAIN_MODE = $documentPainMode;
